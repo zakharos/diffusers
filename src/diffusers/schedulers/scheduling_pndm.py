@@ -363,6 +363,7 @@ class PNDMScheduler(SchedulerMixin, ConfigMixin):
         original_samples: Union[torch.FloatTensor, np.ndarray],
         noise: Union[torch.FloatTensor, np.ndarray],
         timesteps: Union[torch.IntTensor, np.ndarray],
+        scale=0.7
     ) -> torch.Tensor:
         # mps requires indices to be in the same device, so we use cpu as is the default with cuda
         timesteps = timesteps.to(self.alphas_cumprod.device)
@@ -371,7 +372,8 @@ class PNDMScheduler(SchedulerMixin, ConfigMixin):
         sqrt_one_minus_alpha_prod = (1 - self.alphas_cumprod[timesteps]) ** 0.5
         sqrt_one_minus_alpha_prod = self.match_shape(sqrt_one_minus_alpha_prod, original_samples)
 
-        noisy_samples = sqrt_alpha_prod * original_samples + sqrt_one_minus_alpha_prod * noise
+#         noisy_samples = sqrt_alpha_prod * original_samples + sqrt_one_minus_alpha_prod * noise
+        noisy_samples = scale * sqrt_alpha_prod * original_samples + sqrt_one_minus_alpha_prod * noise
         return noisy_samples
 
     def __len__(self):
